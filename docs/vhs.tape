@@ -3,12 +3,14 @@ Output docs/vhs.gif
 Set FontSize 18
 Set Width 1200
 Set Height 680
-Set LoopOffset 55%
+Set LoopOffset 70%
 
 # Setup
 Hide
-Type 'go build -o kubectl-stratagem && export PATH="$PWD:$PATH" && clear'
+Set TypingSpeed 0
+Type 'export PATH="$PWD:$PATH" && clear'
 Enter
+Sleep 0.1s
 Show
 
 # Recording...
@@ -51,6 +53,3 @@ Sleep 5s
 # Cleanup
 Hide
 Type 'q'
-Sleep 0.5s
-Type 'rm kubectl-stratagem'
-Enter

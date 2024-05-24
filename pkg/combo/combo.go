@@ -176,24 +176,24 @@ func (m Model) View() string {
 
 	switch m.State {
 	case StateCorrect:
-		return m.Style.Correct.Render(m.Combo.String() )
+		return m.Style.Correct.Render(m.Combo.String())
 	case StateWrong:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.WrongRemaining.Render(nonMatching.String() )
+			return m.Style.WrongRemaining.Render(nonMatching.String())
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Wrong.Render(matching.String() )
+			return m.Style.Wrong.Render(matching.String())
 		}
 		return m.Style.Wrong.Render(matching.String()+" ") +
 			m.Style.WrongRemaining.Render(nonMatching.String())
 	default:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.Idle.Render(nonMatching.String() )
+			return m.Style.Idle.Render(nonMatching.String())
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Idle.Render(matching.String() )
+			return m.Style.Idle.Render(matching.String())
 		}
 		return m.Style.Input.Render(matching.String()+" ") +
 			m.Style.Idle.Render(nonMatching.String())
