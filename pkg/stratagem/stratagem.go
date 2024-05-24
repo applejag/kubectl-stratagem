@@ -1,25 +1,60 @@
 package stratagem
 
 import (
-	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/applejag/kubectl-stratagem/pkg/combo"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
-func New(name, comboStr string, art []string) Model {
+var DefaultStyle = Style{
+	Name: StyleName{
+		Idle:    lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Bold(true),
+		Wrong:   lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")),
+		Correct: lipgloss.NewStyle().Foreground(lipgloss.Color("#59f258")).Bold(true),
+	},
+	Desc: StyleDesc{
+		Idle:    lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Italic(true),
+		Wrong:   lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Italic(true),
+		Correct: lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Italic(true),
+	},
+}
+
+func New(name, comboStr, desc string, art []string) Model {
 	return Model{
 		Name:  name,
+		Desc:  desc,
 		Art:   art,
 		Combo: combo.New(combo.NewCombo(comboStr), combo.CharsetNerdFontBold),
+		Style: DefaultStyle,
 	}
 }
 
 type Model struct {
 	Name  string
+	Desc  string
 	Art   []string
 	Combo combo.Model
+	Style Style
+}
+
+type Style struct {
+	Name StyleName
+	Desc StyleDesc
+}
+
+type StyleName struct {
+	Idle    lipgloss.Style
+	Wrong   lipgloss.Style
+	Correct lipgloss.Style
+}
+
+type StyleDesc struct {
+	Idle    lipgloss.Style
+	Wrong   lipgloss.Style
+	Correct lipgloss.Style
 }
 
 func (m Model) Init() tea.Cmd {
@@ -44,17 +79,25 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	var sb strings.Builder
+	lines := slices.Clone(m.Art)
+	for i := range lines {
+		lines[i] = " " + lines[i]
+	}
+	middle := len(lines) / 2
 
+	switch m.Combo.State {
+	case combo.StateCorrect:
+		lines[middle-1] += "  " + m.Style.Name.Correct.Render(strings.ToUpper(m.Name))
+		lines[middle-1] += "  " + m.Style.Desc.Correct.Render(m.Desc)
+	case combo.StateWrong:
+		lines[middle-1] += "  " + m.Style.Name.Wrong.Render(strings.ToUpper(m.Name))
+		lines[middle-1] += "  " + m.Style.Desc.Wrong.Render(m.Desc)
+	default:
+		lines[middle-1] += "  " + m.Style.Name.Idle.Render(strings.ToUpper(m.Name))
+		lines[middle-1] += "  " + m.Style.Desc.Idle.Render(m.Desc)
+	}
 
-	fmt.Fprintf(&sb, ""+
-		" %s   %s\n"+
-		" %s  \n"+
-		" %s   %s\n",
-		m.Art[0], strings.ToUpper(m.Name),
-		m.Art[1],
-		m.Art[2], m.Combo.View(),
-	)
+	lines[middle+1] += "  " + m.Combo.View()
 
-	return sb.String()
+	return strings.Join(lines, "\n") + "\n"
 }

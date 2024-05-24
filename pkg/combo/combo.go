@@ -6,7 +6,24 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
+
+var DefaultStyle = Style{
+	Idle:           lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Background(lipgloss.Color("#3b4145")),
+	Input:          lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Background(lipgloss.Color("#3b4145")).Bold(true),
+	Correct:        lipgloss.NewStyle().Foreground(lipgloss.Color("#59f258")).Background(lipgloss.Color("#3b4145")),
+	Wrong:          lipgloss.NewStyle().Foreground(lipgloss.Color("#f26e59")).Background(lipgloss.Color("#3b4145")),
+	WrongRemaining: lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Background(lipgloss.Color("#3b4145")),
+}
+
+type Style struct {
+	Idle           lipgloss.Style
+	Input          lipgloss.Style
+	Correct        lipgloss.Style
+	Wrong          lipgloss.Style
+	WrongRemaining lipgloss.Style
+}
 
 type ResetComboMsg struct{}
 
@@ -14,11 +31,11 @@ func ResetCombo() tea.Msg {
 	return ResetComboMsg{}
 }
 
-type ComboWrongMsg struct{
+type ComboWrongMsg struct {
 	Model Model
 }
 
-type ComboCorrectMsg struct{
+type ComboCorrectMsg struct {
 	Model Model
 }
 
@@ -125,6 +142,7 @@ func New(combo Combo, charset Charset) Model {
 	return Model{
 		Charset: charset,
 		Combo:   combo,
+		Style:   DefaultStyle,
 	}
 }
 
@@ -132,7 +150,8 @@ type Model struct {
 	Charset Charset
 	Combo   Combo
 	Input   int
-	State State
+	State   State
+	Style   Style
 }
 
 func (m Model) Init() tea.Cmd {
@@ -173,6 +192,7 @@ func (m Model) updateInput(key Key) (Model, tea.Cmd) {
 
 	if m.Combo[m.Input] != key {
 		m.State = StateWrong
+		m.Input++
 		return m, m.comboWrong()
 	}
 
@@ -187,18 +207,31 @@ func (m Model) updateInput(key Key) (Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	matching, nonMatching := m.splitCombo()
 
-	s := fmt.Sprintf("%s|%s", matching.StringCharset(m.Charset), nonMatching.StringCharset(m.Charset))
-
-	if m.State == StateCorrect {
-		return "✅"+s
+	switch m.State {
+	case StateCorrect:
+		return m.Style.Correct.Render(" " + m.Combo.StringCharset(m.Charset) + " ")
+	case StateWrong:
+		matching, nonMatching := m.splitCombo()
+		if len(matching) == 0 {
+			return m.Style.WrongRemaining.Render(" " + nonMatching.StringCharset(m.Charset) + " ")
+		}
+		if len(nonMatching) == 0 {
+			return m.Style.Wrong.Render(" " + matching.StringCharset(m.Charset) + " ")
+		}
+		return m.Style.Wrong.Render(" "+matching.StringCharset(m.Charset)+" ") +
+			m.Style.WrongRemaining.Render(nonMatching.StringCharset(m.Charset)+" ")
+	default:
+		matching, nonMatching := m.splitCombo()
+		if len(matching) == 0 {
+			return m.Style.Idle.Render(" " + nonMatching.StringCharset(m.Charset) + " ")
+		}
+		if len(nonMatching) == 0 {
+			return m.Style.Idle.Render(" " + matching.StringCharset(m.Charset) + " ")
+		}
+		return m.Style.Input.Render(" "+matching.StringCharset(m.Charset)+" ") +
+			m.Style.Idle.Render(nonMatching.StringCharset(m.Charset)+" ")
 	}
-	if m.State == StateWrong {
-		return "❌"+s
-	}
-
-	return s
 }
 
 func (m Model) splitCombo() (matching, nonMatching Combo) {
