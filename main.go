@@ -172,7 +172,7 @@ func (m model) View() string {
 		//s += "\n"
 	}
 
-	sb.WriteString("\nPress q to quit.\n")
+	//sb.WriteString("\nPress q to quit.\n")
 
 	// Send the UI for rendering
 	return sb.String()
