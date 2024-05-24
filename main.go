@@ -1,112 +1,94 @@
 package main
 
 import (
-    "fmt"
-    "os"
+	"fmt"
+	"os"
 
-    tea "github.com/charmbracelet/bubbletea"
+	"github.com/applejag/kubectl-stratagem/pkg/stratagem"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-    p := tea.NewProgram(initialModel())
-    if _, err := p.Run(); err != nil {
-        fmt.Printf("Alas, there's been an error: %v", err)
-        os.Exit(1)
-    }
-}
-
-
-type model struct {
-    choices  []string           // items on the to-do list
-    cursor   int                // which to-do list item our cursor is pointing at
-    selected map[int]struct{}   // which to-do items are selected
-}
-
-func initialModel() model {
-	return model{
-		// Our to-do list is a grocery list
-		choices:  []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
-
-		// A map which indicates which choices are selected. We're using
-		// the  map like a mathematical set. The keys refer to the indexes
-		// of the `choices` slice, above.
-		selected: make(map[int]struct{}),
+	p := tea.NewProgram(initialModel())
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
 }
 
+type model struct {
+	stratagem stratagem.Model
+}
+
+func initialModel() model {
+	m := model{
+		stratagem: stratagem.New(),
+	}
+
+	m.stratagem.Stratagems = []stratagem.Stratagem{
+		// ↑ ↓ ← →
+		stratagem.NewStratagem("Reinforce", "↑ ↓ → ← ↑", []string{
+			` _--_ +`,
+			` |<>|  `,
+			`_\  /_ `,
+		}),
+		stratagem.NewStratagem("Hellbomb", "↓ ↑ ← ↓ ↑ → ↓ ↑", []string{
+			"(<```>)",
+			` _|_|_ `,
+			`__| |__`,
+		}),
+		stratagem.NewStratagem("Orbital Railcannon Strike", "→ ↑ ↓ ↓ →", []string{
+			`   X   `,
+			` __X__ `,
+			`/  V  \`,
+		}),
+		stratagem.NewStratagem("Eagle 500kg Bomb", "↑ → ↓ ↓ ↓", []string{
+            `|\_v_/|`,
+            ` \_V_/ `,
+            `   V   `,
+        }),
+	}
+	return m
+}
+
 func (m model) Init() tea.Cmd {
-    // Just return `nil`, which means "no I/O right now, please."
-    return nil
+	// Just return `nil`, which means "no I/O right now, please."
+	return nil
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    switch msg := msg.(type) {
+	switch msg := msg.(type) {
 
-    // Is it a key press?
-    case tea.KeyMsg:
+	// Is it a key press?
+	case tea.KeyMsg:
 
-        // Cool, what was the actual key pressed?
-        switch msg.String() {
+		// Cool, what was the actual key pressed?
+		switch msg.String() {
 
-        // These keys should exit the program.
-        case "ctrl+c", "q":
-            return m, tea.Quit
+		// These keys should exit the program.
+		case "ctrl+c", "q":
+			return m, tea.Quit
 
-        // The "up" and "k" keys move the cursor up
-        case "up", "k":
-            if m.cursor > 0 {
-                m.cursor--
-            }
+		default:
+			var cmd tea.Cmd
+			m.stratagem, cmd = m.stratagem.Update(msg)
+			return m, cmd
+		}
+	}
 
-        // The "down" and "j" keys move the cursor down
-        case "down", "j":
-            if m.cursor < len(m.choices)-1 {
-                m.cursor++
-            }
-
-        // The "enter" key and the spacebar (a literal space) toggle
-        // the selected state for the item that the cursor is pointing at.
-        case "enter", " ":
-            _, ok := m.selected[m.cursor]
-            if ok {
-                delete(m.selected, m.cursor)
-            } else {
-                m.selected[m.cursor] = struct{}{}
-            }
-        }
-    }
-
-    // Return the updated model to the Bubble Tea runtime for processing.
-    // Note that we're not returning a command.
-    return m, nil
+	// Return the updated model to the Bubble Tea runtime for processing.
+	// Note that we're not returning a command.
+	return m, nil
 }
 
 func (m model) View() string {
-    // The header
-    s := "What should we buy at the market?\n\n"
 
-    // Iterate over our choices
-    for i, choice := range m.choices {
+	s := "[ @ STRATAGEMS ]\n\n"
 
-        // Is the cursor pointing at this choice?
-        cursor := " " // no cursor
-        if m.cursor == i {
-            cursor = ">" // cursor!
-        }
+	s += m.stratagem.View()
 
-        // Is this choice selected?
-        checked := " " // not selected
-        if _, ok := m.selected[i]; ok {
-            checked = "x" // selected!
-        }
+	s += "\nPress q to quit.\n"
 
-        // Render the row
-        s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
-    }
-
-    // The footer
-    s += "\nPress q to quit.\n"
-
-    // Send the UI for rendering
-    return s
+	// Send the UI for rendering
+	return s
 }
