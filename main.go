@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/applejag/kubectl-stratagem/pkg/combo"
 	"github.com/applejag/kubectl-stratagem/pkg/stratagem"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -17,38 +18,35 @@ func main() {
 }
 
 type model struct {
-	stratagem stratagem.Model
+	stratagems []stratagem.Model
 }
 
 func initialModel() model {
-	m := model{
-		stratagem: stratagem.New(),
+	return model{
+		stratagems: []stratagem.Model{
+			// ↑ ↓ ← →
+			stratagem.New("Reinforce", "↑ ↓ → ← ↑", []string{
+				` _--_ +`,
+				` |<>|  `,
+				`_\  /_ `,
+			}),
+			stratagem.New("Hellbomb", "↓ ↑ ← ↓ ↑ → ↓ ↑", []string{
+				"(<```>)",
+				` _|_|_ `,
+				`__| |__`,
+			}),
+			stratagem.New("Orbital Railcannon Strike", "→ ↑ ↓ ↓ →", []string{
+				`   x   `,
+				` __x__ `,
+				`/  V  \`,
+			}),
+			stratagem.New("Eagle 500kg Bomb", "↑ → ↓ ↓ ↓", []string{
+				`|\_v_/|`,
+				` \_V_/ `,
+				`   V   `,
+			}),
+		},
 	}
-
-	m.stratagem.Stratagems = []stratagem.Stratagem{
-		// ↑ ↓ ← →
-		stratagem.NewStratagem("Reinforce", "↑ ↓ → ← ↑", []string{
-			` _--_ +`,
-			` |<>|  `,
-			`_\  /_ `,
-		}),
-		stratagem.NewStratagem("Hellbomb", "↓ ↑ ← ↓ ↑ → ↓ ↑", []string{
-			"(<```>)",
-			` _|_|_ `,
-			`__| |__`,
-		}),
-		stratagem.NewStratagem("Orbital Railcannon Strike", "→ ↑ ↓ ↓ →", []string{
-			`   X   `,
-			` __X__ `,
-			`/  V  \`,
-		}),
-		stratagem.NewStratagem("Eagle 500kg Bomb", "↑ → ↓ ↓ ↓", []string{
-            `|\_v_/|`,
-            ` \_V_/ `,
-            `   V   `,
-        }),
-	}
-	return m
 }
 
 func (m model) Init() tea.Cmd {
@@ -69,11 +67,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
+		case "esc":
+			return m, combo.ResetCombo
+
 		default:
-			var cmd tea.Cmd
-			m.stratagem, cmd = m.stratagem.Update(msg)
-			return m, cmd
+			return m.updateStrats(msg)
 		}
+
+	case combo.ResetComboMsg:
+		return m.updateStrats(msg)
 	}
 
 	// Return the updated model to the Bubble Tea runtime for processing.
@@ -81,11 +83,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func (m model) updateStrats(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+	for i, strat := range m.stratagems {
+		var cmd tea.Cmd
+		m.stratagems[i], cmd = strat.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+	return m, tea.Batch(cmds...)
+}
+
 func (m model) View() string {
 
 	s := "[ @ STRATAGEMS ]\n\n"
 
-	s += m.stratagem.View()
+	for _, strat := range m.stratagems {
+		s += strat.View()
+		s += "\n"
+	}
 
 	s += "\nPress q to quit.\n"
 
