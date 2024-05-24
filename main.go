@@ -46,8 +46,8 @@ func initialModel() model {
 			lipgloss.NewStyle().Foreground(darkCyan),
 		),
 		stratagems: []stratagem.Model{
-			// ↑ ↓ ← →
-			stratagem.New("Reinforce", "↑ ↓ → ← ↑", "Reinforce deployment by doubling its replicas", asciiart.AddBorder(
+			// 🡅 🡇 🡄 🡆
+			stratagem.New("Reinforce", "🡅 🡇 🡆 🡄 🡅", "Reinforce deployment by doubling its replicas", asciiart.AddBorder(
 				asciiart.NewStyled([]string{
 					` _--_ +`,
 					` |<>|  `,
@@ -63,7 +63,7 @@ func initialModel() model {
 				lipgloss.NewStyle().Foreground(darkBeige),
 			)),
 
-			stratagem.New("Hellbomb", "↓ ↑ ← ↓ ↑ → ↓ ↑", "Liberate an entire namespace (DANGER!)", asciiart.AddBorder(
+			stratagem.New("Hellbomb", "🡇 🡅 🡄 🡇 🡅 🡆 🡇 🡅", "Liberate an entire namespace (DANGER!)", asciiart.AddBorder(
 				asciiart.NewStyled([]string{
 					"(<```>)",
 					` _|_|_ `,
@@ -79,7 +79,7 @@ func initialModel() model {
 				lipgloss.NewStyle().Foreground(darkBeige),
 			)),
 
-			stratagem.New("Orbital Railcannon Strike", "→ ↑ ↓ ↓ →", "Terminate bug pod with Super Destroyer railcannon round", asciiart.AddBorder(
+			stratagem.New("Orbital Railcannon Strike", "🡆 🡅 🡇 🡇 🡆", "Terminate bug pod with Super Destroyer railcannon round", asciiart.AddBorder(
 				asciiart.NewStyled([]string{
 					`   x   `,
 					` __x__ `,
@@ -95,7 +95,7 @@ func initialModel() model {
 				lipgloss.NewStyle().Foreground(darkRed),
 			)),
 
-			stratagem.New("Eagle 500kg Bomb", "↑ → ↓ ↓ ↓", "Obliterate any bug pods close to impact", asciiart.AddBorder(
+			stratagem.New("Eagle 500kg Bomb", "🡅 🡆 🡇 🡇 🡇", "Obliterate any bug pods close to impact", asciiart.AddBorder(
 				asciiart.NewStyled([]string{
 					`|\_v_/|`,
 					` \_V_/ `,

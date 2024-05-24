@@ -47,42 +47,14 @@ const (
 	StateCorrect
 )
 
-type Charset byte
-
-const (
-	CharsetUnicode Charset = iota
-	CharsetNerdFontBold
-)
-
 type Key rune
 
 const (
-	KeyUp    Key = '↑'
-	KeyDown  Key = '↓'
-	KeyLeft  Key = '←'
-	KeyRight Key = '→'
+	KeyUp    Key = '🡅'
+	KeyDown  Key = '🡇'
+	KeyLeft  Key = '🡄'
+	KeyRight Key = '🡆'
 )
-
-func (k Key) RuneCharset(charset Charset) rune {
-	switch charset {
-	case CharsetUnicode:
-		return rune(k)
-
-	// https://www.nerdfonts.com/cheat-sheet
-	case CharsetNerdFontBold:
-		switch k {
-		case KeyUp:
-			return '󰜷'
-		case KeyDown:
-			return '󰜮'
-		case KeyLeft:
-			return '󰜱'
-		case KeyRight:
-			return '󰜴'
-		}
-	}
-	return ' '
-}
 
 type Combo []Key
 
@@ -102,10 +74,6 @@ func (c Combo) CutPrefix(prefix Combo) (Combo, bool) {
 }
 
 func (c Combo) String() string {
-	return c.StringCharset(CharsetUnicode)
-}
-
-func (c Combo) StringCharset(charset Charset) string {
 	if len(c) == 0 {
 		return ""
 	}
@@ -115,7 +83,7 @@ func (c Combo) StringCharset(charset Charset) string {
 		if i > 0 {
 			sb.WriteByte(' ')
 		}
-		sb.WriteRune(key.RuneCharset(charset))
+		sb.WriteRune(rune(key))
 	}
 	return sb.String()
 }
@@ -138,16 +106,14 @@ func NewCombo(s string) Combo {
 	return combo
 }
 
-func New(combo Combo, charset Charset) Model {
+func New(combo Combo) Model {
 	return Model{
-		Charset: charset,
 		Combo:   combo,
 		Style:   DefaultStyle,
 	}
 }
 
 type Model struct {
-	Charset Charset
 	Combo   Combo
 	Input   int
 	State   State
@@ -210,27 +176,27 @@ func (m Model) View() string {
 
 	switch m.State {
 	case StateCorrect:
-		return m.Style.Correct.Render(" " + m.Combo.StringCharset(m.Charset) + " ")
+		return m.Style.Correct.Render(" " + m.Combo.String() + " ")
 	case StateWrong:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.WrongRemaining.Render(" " + nonMatching.StringCharset(m.Charset) + " ")
+			return m.Style.WrongRemaining.Render(" " + nonMatching.String() + " ")
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Wrong.Render(" " + matching.StringCharset(m.Charset) + " ")
+			return m.Style.Wrong.Render(" " + matching.String() + " ")
 		}
-		return m.Style.Wrong.Render(" "+matching.StringCharset(m.Charset)+" ") +
-			m.Style.WrongRemaining.Render(nonMatching.StringCharset(m.Charset)+" ")
+		return m.Style.Wrong.Render(" "+matching.String()+" ") +
+			m.Style.WrongRemaining.Render(nonMatching.String()+" ")
 	default:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.Idle.Render(" " + nonMatching.StringCharset(m.Charset) + " ")
+			return m.Style.Idle.Render(" " + nonMatching.String() + " ")
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Idle.Render(" " + matching.StringCharset(m.Charset) + " ")
+			return m.Style.Idle.Render(" " + matching.String() + " ")
 		}
-		return m.Style.Input.Render(" "+matching.StringCharset(m.Charset)+" ") +
-			m.Style.Idle.Render(nonMatching.StringCharset(m.Charset)+" ")
+		return m.Style.Input.Render(" "+matching.String()+" ") +
+			m.Style.Idle.Render(nonMatching.String()+" ")
 	}
 }
 

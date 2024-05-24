@@ -27,7 +27,7 @@ func New(name, comboStr, desc string, art []string) Model {
 		Name:  name,
 		Desc:  desc,
 		Art:   art,
-		Combo: combo.New(combo.NewCombo(comboStr), combo.CharsetNerdFontBold),
+		Combo: combo.New(combo.NewCombo(comboStr)),
 		Style: DefaultStyle,
 	}
 }
