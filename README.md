@@ -3,7 +3,7 @@
 *Call in stratagems on your Kubernetes components, FOR LIBERTY, FOR FREEDOM,
 **FOR MANAGED DEMOCRACY***
 
-![screenshot](./docs/screenshot.png)
+![Screencast of kubectl-stratagem in action](./docs/vhs.gif)
 
 ## Development
 
