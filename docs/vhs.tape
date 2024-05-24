@@ -46,6 +46,7 @@ Right
 Down
 Up
 
+Screenshot ./docs/vhs.png
 Sleep 3s
 Escape
 Sleep 5s
