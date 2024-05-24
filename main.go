@@ -37,7 +37,7 @@ func initialModel() model {
 	return model{
 		header: asciiart.AddBorder(
 			asciiart.NewStyled([]string{
-				`  ⦿  STRATAGEMS  `,
+				`  🌐 STRATAGEMS  `,
 			}, []string{
 				`wwwwwwwwwwwwwwwww`,
 			}, map[rune]lipgloss.Style{

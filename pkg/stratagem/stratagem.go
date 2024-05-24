@@ -16,7 +16,7 @@ var DefaultStyle = Style{
 		Correct: lipgloss.NewStyle().Foreground(lipgloss.Color("#59f258")).Bold(true),
 	},
 	Desc: StyleDesc{
-		Idle:    lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Italic(true),
+		Idle:    lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Italic(true),
 		Wrong:   lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Italic(true),
 		Correct: lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Italic(true),
 	},
@@ -88,13 +88,13 @@ func (m Model) View() string {
 	switch m.Combo.State {
 	case combo.StateCorrect:
 		lines[middle-1] += "  " + m.Style.Name.Correct.Render(strings.ToUpper(m.Name))
-		lines[middle-1] += "  " + m.Style.Desc.Correct.Render(m.Desc)
+		lines[middle-0] += "  " + m.Style.Desc.Correct.Render(m.Desc)
 	case combo.StateWrong:
 		lines[middle-1] += "  " + m.Style.Name.Wrong.Render(strings.ToUpper(m.Name))
-		lines[middle-1] += "  " + m.Style.Desc.Wrong.Render(m.Desc)
+		lines[middle-0] += "  " + m.Style.Desc.Wrong.Render(m.Desc)
 	default:
 		lines[middle-1] += "  " + m.Style.Name.Idle.Render(strings.ToUpper(m.Name))
-		lines[middle-1] += "  " + m.Style.Desc.Idle.Render(m.Desc)
+		lines[middle-0] += "  " + m.Style.Desc.Idle.Render(m.Desc)
 	}
 
 	lines[middle+1] += "  " + m.Combo.View()

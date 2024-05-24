@@ -10,11 +10,11 @@ import (
 )
 
 var DefaultStyle = Style{
-	Idle:           lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")).Background(lipgloss.Color("#3b4145")),
-	Input:          lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Background(lipgloss.Color("#3b4145")).Bold(true),
-	Correct:        lipgloss.NewStyle().Foreground(lipgloss.Color("#59f258")).Background(lipgloss.Color("#3b4145")),
-	Wrong:          lipgloss.NewStyle().Foreground(lipgloss.Color("#f26e59")).Background(lipgloss.Color("#3b4145")),
-	WrongRemaining: lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Background(lipgloss.Color("#3b4145")),
+	Idle:           lipgloss.NewStyle().Foreground(lipgloss.Color("#f3eedb")),
+	Input:          lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")).Bold(true),
+	Correct:        lipgloss.NewStyle().Foreground(lipgloss.Color("#59f258")),
+	Wrong:          lipgloss.NewStyle().Foreground(lipgloss.Color("#f26e59")),
+	WrongRemaining: lipgloss.NewStyle().Foreground(lipgloss.Color("#827f74")),
 }
 
 type Style struct {
@@ -108,16 +108,16 @@ func NewCombo(s string) Combo {
 
 func New(combo Combo) Model {
 	return Model{
-		Combo:   combo,
-		Style:   DefaultStyle,
+		Combo: combo,
+		Style: DefaultStyle,
 	}
 }
 
 type Model struct {
-	Combo   Combo
-	Input   int
-	State   State
-	Style   Style
+	Combo Combo
+	Input int
+	State State
+	Style Style
 }
 
 func (m Model) Init() tea.Cmd {
@@ -176,27 +176,27 @@ func (m Model) View() string {
 
 	switch m.State {
 	case StateCorrect:
-		return m.Style.Correct.Render(" " + m.Combo.String() + " ")
+		return m.Style.Correct.Render(m.Combo.String() )
 	case StateWrong:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.WrongRemaining.Render(" " + nonMatching.String() + " ")
+			return m.Style.WrongRemaining.Render(nonMatching.String() )
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Wrong.Render(" " + matching.String() + " ")
+			return m.Style.Wrong.Render(matching.String() )
 		}
-		return m.Style.Wrong.Render(" "+matching.String()+" ") +
-			m.Style.WrongRemaining.Render(nonMatching.String()+" ")
+		return m.Style.Wrong.Render(matching.String()+" ") +
+			m.Style.WrongRemaining.Render(nonMatching.String())
 	default:
 		matching, nonMatching := m.splitCombo()
 		if len(matching) == 0 {
-			return m.Style.Idle.Render(" " + nonMatching.String() + " ")
+			return m.Style.Idle.Render(nonMatching.String() )
 		}
 		if len(nonMatching) == 0 {
-			return m.Style.Idle.Render(" " + matching.String() + " ")
+			return m.Style.Idle.Render(matching.String() )
 		}
-		return m.Style.Input.Render(" "+matching.String()+" ") +
-			m.Style.Idle.Render(nonMatching.String()+" ")
+		return m.Style.Input.Render(matching.String()+" ") +
+			m.Style.Idle.Render(nonMatching.String())
 	}
 }
 
