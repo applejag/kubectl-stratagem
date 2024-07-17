@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -108,16 +109,18 @@ func NewCombo(s string) Combo {
 
 func New(combo Combo) Model {
 	return Model{
-		Combo: combo,
-		Style: DefaultStyle,
+		Combo:  combo,
+		Style:  DefaultStyle,
+		KeyMap: DefaultKeyMap,
 	}
 }
 
 type Model struct {
-	Combo Combo
-	Input int
-	State State
-	Style Style
+	Combo  Combo
+	Input  int
+	State  State
+	Style  Style
+	KeyMap KeyMap
 }
 
 func (m Model) Init() tea.Cmd {
@@ -128,14 +131,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "up":
+		switch {
+		case key.Matches(msg, m.KeyMap.StrategemUp):
 			return m.updateInput(KeyUp)
-		case "down":
+		case key.Matches(msg, m.KeyMap.StrategemDown):
 			return m.updateInput(KeyDown)
-		case "left":
+		case key.Matches(msg, m.KeyMap.StrategemLeft):
 			return m.updateInput(KeyLeft)
-		case "right":
+		case key.Matches(msg, m.KeyMap.StrategemRight):
 			return m.updateInput(KeyRight)
 
 		default:
