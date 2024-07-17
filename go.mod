@@ -1,6 +1,6 @@
 module github.com/applejag/kubectl-stratagem
 
-go 1.22.3
+go 1.22.5
 
 require (
 	github.com/charmbracelet/bubbletea v0.26.6
