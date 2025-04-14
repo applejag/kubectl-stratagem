@@ -1,8 +1,10 @@
 module github.com/applejag/kubectl-stratagem
 
 go 1.22.5
+toolchain go1.24.1
+
 require (
-	github.com/charmbracelet/bubbles v0.20.0
+	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.1.0
 )
